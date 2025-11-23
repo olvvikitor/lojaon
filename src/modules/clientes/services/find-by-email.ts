@@ -10,10 +10,10 @@ export class FindByEmailService {
     ) {}
 
     async execute(email: string): Promise<Cliente> {
-        const cliente:Cliente | null =  await this.clienteRepository.findByEmail(email)
+        const cliente:Cliente | null =  await this.clienteRepository.findByEmailOrCpf({email, cpf:''});
         if(!cliente){
-            throw new NotFoundException("Cliente not found");
-        }   
+            throw new NotFoundException('Cliente não encontrado');
+        }
         return cliente;
     }
 

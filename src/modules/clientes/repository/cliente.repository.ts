@@ -6,24 +6,30 @@ import { Cliente } from "../models/Cliente.entity";
 
 
 @Injectable()
-export class ClienteRepository implements IClienteRepository{
+export class ClienteRepository implements IClienteRepository {
 
-  constructor(private prisma: PrismaService) {}
+    constructor(private prisma: PrismaService) { }
 
-
-    async findByEmail(id: string): Promise<Cliente | null> {
-        const cliente =  await this.prisma.cliente.findUnique({
-            where: {
-                email: id
-            }
-        });
-        return ClienteMapper.toDomainFromPrisma(cliente);
+async findByEmailOrCpf(params: { cpf: string; email: string }): Promise<Cliente | null> {
+  const cliente = await this.prisma.cliente.findFirst({
+    where: {
+      OR: [
+        { cpf: params.cpf },
+        { email: params.email }
+      ]
     }
+  });
+
+  if (!cliente) return null;
+
+  return ClienteMapper.toDomainFromPrisma(cliente);
+}
+
 
     async createCliente(cliente: Cliente): Promise<void> {
         const clienteData = ClienteMapper.toPrisma(cliente);
         await this.prisma.cliente.create({
-            data:{
+            data: {
                 cpf: clienteData.cpf,
                 email: clienteData.email,
                 name: clienteData.name,
@@ -31,7 +37,7 @@ export class ClienteRepository implements IClienteRepository{
                 telefone: clienteData.telefone
             }
         })
-        }
+    }
 
     findById(id: string): Promise<Cliente> {
         throw new Error("Method not implemented.");

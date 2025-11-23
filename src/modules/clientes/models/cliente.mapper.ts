@@ -27,6 +27,7 @@ export class ClienteMapper {
   }
 
   static toDomainFromPrisma(raw: any): Cliente {
+    console.log(raw)
     return new Cliente(
       raw.id,
       raw.name,
